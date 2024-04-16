@@ -23,7 +23,7 @@ Measurement = base.classes.measurement
 Station = base.classes.station
 
 # Create our session (link) from Python to the DB
-session = Session(engine)
+# session = Session(engine)
 
 #################################################
 # Flask Setup
@@ -79,6 +79,7 @@ def station():
 @app.route("/api/v1.0/tobs")
 def tobs():
     print("Server received request for 'Tobs' page...")
+    session = Session(engine)
 
     results = session.query(Measurement.tobs).\
         filter(Measurement.station == 'USC00519281').\
@@ -86,10 +87,12 @@ def tobs():
 
     temperatures = list(np.ravel(results))
 
+    session.close()
     return jsonify(temperatures=temperatures)
 
 @app.route("/api/v1.0/<start>")
 def start(start):
+    session = Session(engine)
     start = dt.datetime.strptime(start, '%m%d%Y')
 
     print(f'date: {start}')
@@ -101,10 +104,12 @@ def start(start):
     
     stats = list(np.ravel(results))
 
+    session.close()
     return jsonify(minmaxavg=stats)
 
 @app.route("/api/v1.0/<start>/<end>")
 def startend(start, end):
+    session = Session(engine)
     start = dt.datetime.strptime(start, '%m%d%Y')
     end = dt.datetime.strptime(end, '%m%d%Y')
 
@@ -115,6 +120,7 @@ def startend(start, end):
 
     stats = list(np.ravel(results))
 
+    session.close()
     return jsonify(minmaxavg=stats)
 
 if __name__ == "__main__":
